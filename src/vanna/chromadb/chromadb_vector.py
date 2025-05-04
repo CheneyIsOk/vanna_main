@@ -9,7 +9,13 @@ from chromadb.utils import embedding_functions
 from ..base import VannaBase
 from ..utils import deterministic_uuid
 
-default_ef = embedding_functions.DefaultEmbeddingFunction()
+# default_ef = embedding_functions.DefaultEmbeddingFunction()  # 默认模型
+ 
+# 使用本地模型
+default_ef = embedding_functions.OllamaEmbeddingFunction(
+    url="http://localhost:11434/api/embeddings",
+    model_name="quentinz/bge-large-zh-v1.5:latest"
+)
 
 
 class ChromaDB_VectorStore(VannaBase):
@@ -22,10 +28,13 @@ class ChromaDB_VectorStore(VannaBase):
         self.embedding_function = config.get("embedding_function", default_ef)
         curr_client = config.get("client", "persistent")
         collection_metadata = config.get("collection_metadata", None)
+
+        # 限定返回的数据条数
         self.n_results_sql = config.get("n_results_sql", config.get("n_results", 10))
         self.n_results_documentation = config.get("n_results_documentation", config.get("n_results", 10))
         self.n_results_ddl = config.get("n_results_ddl", config.get("n_results", 10))
 
+        # 数据存储方式
         if curr_client == "persistent":
             self.chroma_client = chromadb.PersistentClient(
                 path=path, settings=Settings(anonymized_telemetry=False)
