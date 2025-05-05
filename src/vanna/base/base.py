@@ -152,7 +152,7 @@ class VannaBase(ABC):
                         question=question,
                         question_sql_list=question_sql_list,
                         ddl_list=ddl_list,
-                        doc_list=doc_list+[f"The following is a pandas DataFrame with the results of the intermediate SQL query {intermediate_sql}: \n" + df.to_markdown()],
+                        doc_list=doc_list+[f"The following is a pandas DataFrame with the results of the intermediate SQL query {intermediate_sql}: \n" + df.to_markdown(index=False)],
                         **kwargs,
                     )
                     self.log(title="Final SQL Prompt", message=prompt)
@@ -323,7 +323,7 @@ class VannaBase(ABC):
 
         message_log = [
             self.system_message(
-                f"You are a helpful data assistant. The user asked the question: '{question}'\n\nThe SQL query for this question was: {sql}\n\nThe following is a pandas DataFrame with the results of the query: \n{df.head(25).to_markdown()}\n\n"
+                f"You are a helpful data assistant. The user asked the question: '{question}'\n\nThe SQL query for this question was: {sql}\n\nThe following is a pandas DataFrame with the results of the query: \n{df.head(25).to_markdown(index=False)}\n\n"
             ),
             self.user_message(
                 f"Generate a list of {n_questions} followup questions that the user might ask about this data. Respond with a list of questions, one per line. Do not answer with any explanations -- just the questions. Remember that there should be an unambiguous SQL query that can be generated from the question. Prefer questions that are answerable outside of the context of this conversation. Prefer questions that are slight modifications of the SQL query that was generated that allow digging deeper into the data. Each question will be turned into a button that the user can click to generate a new SQL query so don't use 'example' type questions. Each question must have a one-to-one correspondence with an instantiated SQL query." +
@@ -368,7 +368,7 @@ class VannaBase(ABC):
 
         message_log = [
             self.system_message(
-                f"You are a helpful data assistant. The user asked the question: '{question}'\n\nThe following is a pandas DataFrame with the results of the query: \n{df.to_markdown()}\n\n"
+                f"You are a helpful data assistant. The user asked the question: '{question}'\n\nThe following is a pandas DataFrame with the results of the query: \n{df.to_markdown(index=False)}\n\n"
             ),
             self.user_message(
                 "Briefly summarize the data based on the question that was asked. Do not respond with any additional explanation beyond the summary." +
@@ -1485,7 +1485,7 @@ class VannaBase(ABC):
                         f'{database_column} == "{database}" and {schema_column} == "{schema}" and {table_column} == "{table}"'
                     )
                     doc = f"The following columns are in the {table} table in the {database} database:\n\n"
-                    doc += df_columns_filtered_to_table[columns].to_markdown()
+                    doc += df_columns_filtered_to_table[columns].to_markdown(index=False)
 
                     plan._plan.append(
                         TrainingPlanItem(
@@ -1609,7 +1609,7 @@ class VannaBase(ABC):
                                     "DATA_TYPE",
                                     "COMMENT",
                                 ]
-                            ].to_markdown()
+                            ].to_markdown(index=False)
 
                             plan._plan.append(
                                 TrainingPlanItem(
